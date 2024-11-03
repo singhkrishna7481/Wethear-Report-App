@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Basic styling for body */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #0052D4 0%, #4364F7 50%, #6FB1FC 100%);
+            color: #fff;
+            margin: 0;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            box-sizing: border-box;
+            transition: background-color 0.3s;
+        }
+
+        /* Weather container styling */
+        .weather-container {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            width: 90%;
+            max-width: 500px;
+            position: relative; /* Position relative to place icon */
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        /* Headings and text */
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        /* Search container styling */
+        .search-container {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+        }
+
+        input[type="text"] {
+            padding: 12px;
+            border: none;
+            border-radius: 5px 0 0 5px;
+            outline: none;
+            flex: 1;
+            font-size: 1em;
+            transition: box-shadow 0.3s;
+            color: #34495E; /* Dark gray */
+        }
+
+        input[type="text"]:focus {
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.7);
+        }
+
+        .button {
+            padding: 12px 20px;
+            background-color: #0072ff;
+            color: #fff;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s, transform 0.2s;
+            font-weight: bold;
+        }
+
+        .button:hover {
+            background-color: #005bb5;
+            transform: scale(1.05);
+        }
+
+        /* Weather information styling */
+        .weather-info {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .weather-icon {
+            font-size: 50px;
+            margin-top: 15px;
+            text-align: center; /* Center icon */
+        }
+
+        .temperature {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #FFD700; /* Gold color for temperature */
+        }
+
+        .weather-details {
+            margin-top: 10px;
+        }
+
+        /* Loading spinner styles */
+        .loading {
+            display: none; /* Initially hidden */
+            font-size: 20px;
+            margin-top: 20px;
+        }
+
+        /* Dark mode icon */
+        .dark-mode-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: transparent;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 25px;
+            transition: transform 0.2s;
+        }
+
+        .dark-mode toggle:hover {
+            transform: scale(1.1);
+        }
+
+        /* Media queries for responsiveness */
+        @media only screen and (max-width: 600px) {
+            h1 {
+                font-size: 2em; /* Responsive heading size */
+            }
+
+            .button {
+                padding: 10px 15px; /* Responsive button size */
+            }
+        }
+
+        .dark-mode {
+            background: #2b2b2b;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        // Dark mode toggle
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            let container = document.querySelector('.weather-container');
+            if (document.body.classList.contains('dark-mode')) {
+                container.style.background = 'rgba(255, 255, 255, 0.2)';
+            } else {
+                container.style.background = 'rgba(255, 255, 255, 0.1)';
+            }
+        }
+
+        /* // Get user's geolocation and send it to the server
+        navigator.geolocation.getCurrentPosition(function(position) {
+            var latitude = position.coords.latitude;
+            var longitude = position.coords.longitude;
+            $.ajax({
+                type: 'POST',
+                url: '/location',
+                data: JSON.stringify({ latitude: latitude, longitude: longitude }),
+                contentType: 'application/json'
+            });
+        });
+ */
+        // Display loading message
+        const showLoading = () => {
+            $('.loading').show();
+            $('.weather-info').hide();
+        };
+
+        const hideLoading = () => {
+            $('.loading').hide();
+        };
+
+        $(document).ready(function() {
+            $('form').on('submit', function() {
+                showLoading();
+                setTimeout(hideLoading, 2000); // Simulate a loading time
+            });
+        });
+    </script>
+    
+    <div class="weather-container">
+        <button onclick="toggleDarkMode()" class="dark-mode-toggle">
+            <i class="fas fa-adjust"></i> <!-- Dark mode icon -->
+        </button>
+        <h1>Weather Forecast</h1>
+        <div class="search-container">
+            <form action="getWeather" method="get" style="display: flex; flex-grow: 1;">
+                <input type="text" id="cityInput" name="city" placeholder="Enter City Name" required>
+                <input type="submit" value="Search" class="button">
+            </form>
+        </div>
+
+        <div class="loading">Loading...</div>
+
+        <div class="weather-info" th:if="${isFound != null}">
+            <div class="weather-icon" th:class="${iconClass}"><i class="fas fa-sun"></i></div>
+            <h2><span th:text="${name}"></span>, <span th:text="${country}"></span></h2>
+            <p class="temperature">Feels Like: <span th:text="${feels_like}"></span>°C</p>
+            <div class="weather-details">
+            <p>Min Temperature: <span th:text="${min_temp}"></span>°C</p>
+            <p>Max Temperature: <span th:text="${max_temp}"></span>°C</p>
+                <p>Humidity: <span th:text="${humid}"></span>%</p>
+                 <p>Pressure: <span th:text="${pressure}"></span></p>
+                <p>Weather: <span th:text="${info}"></span></p>
+                <p>Wind: <span th:text="${speed}"></span> KMPH</p>
+                <!--
+                <p>UV Index: <span th:text="${uvIndex}"></span></p> UV Index -->
+                <p>Sunrise: <span th:text="${sunrise}"></span></p>
+                <p>Sunset: <span th:text="${sunset}"></span></p> 
+            </div>
+        </div>
+    </div>
+</body>
+</html>
